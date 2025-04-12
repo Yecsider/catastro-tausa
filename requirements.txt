@@ -1,9 +1,10 @@
-flask==2.3.2
-flask-sqlalchemy==3.0.3
-flask-login==0.6.2
-psycopg2-binary==2.9.6
-flask-wtf==1.0.0
-python-dotenv==1.0.0
-folium==0.14.0
+flask==2.0.3
+flask-sqlalchemy==2.5.1
+flask-login==0.5.0
+psycopg2-binary==2.9.3
+flask-wtf==0.15.1
+python-dotenv==0.19.2
+folium==0.12.1
 gunicorn==20.1.0
-werkzeug==2.3.7  # Versión específica que incluye url_decode en el lugar esperado
+werkzeug==2.0.3
+wtforms==2.3.3

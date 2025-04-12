@@ -5,7 +5,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
     startCommand: |
-      gunicorn run:app
+      gunicorn --bind 0.0.0.0:$PORT run:app
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -13,3 +13,5 @@ services:
         fromDatabase:
           name: catastro_db
           property: connectionString
+      - key: FLASK_APP
+        value: run.py
