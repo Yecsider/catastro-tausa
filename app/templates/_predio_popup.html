@@ -1,0 +1,34 @@
+<div style='width: 250px;'>
+    <h6 style='margin-bottom: 10px;'>Editar Predio {{ predio.codigo }}</h6>
+    <form id='form-{{ predio.id }}' class='edit-predio-form'>
+        <input type='hidden' name='id' value='{{ predio.id }}'>
+        <div class='mb-2'>
+            <label class='form-label'><b>Código:</b></label>
+            <input type='text' name='codigo' value='{{ predio.codigo }}' class='form-control form-control-sm'>
+        </div>
+        <div class='mb-2'>
+            <label class='form-label'><b>Dirección:</b></label>
+            <input type='text' name='direccion' value='{{ predio.direccion }}' class='form-control form-control-sm'>
+        </div>
+        <div class='mb-2'>
+            <label class='form-label'><b>Área (m²):</b></label>
+            <input type='number' step='0.01' name='area' value='{{ predio.area }}' class='form-control form-control-sm'>
+        </div>
+        <div class='mb-2'>
+            <label class='form-label'><b>Propietario:</b></label>
+            <input type='text' name='propietario' value='{{ predio.propietario }}' class='form-control form-control-sm'>
+        </div>
+        <div class='mb-2'>
+            <label class='form-label'><b>Latitud:</b></label>
+            <input type='number' step='0.000001' name='latitud' value='{{ predio.latitud }}' class='form-control form-control-sm' readonly>
+        </div>
+        <div class='mb-2'>
+            <label class='form-label'><b>Longitud:</b></label>
+            <input type='number' step='0.000001' name='longitud' value='{{ predio.longitud }}' class='form-control form-control-sm' readonly>
+        </div>
+        <div class='d-flex justify-content-between mt-2'>
+            <button type='button' class='btn btn-sm btn-primary save-predio' data-id='{{ predio.id }}'>Guardar</button>
+            <button type='button' class='btn btn-sm btn-danger delete-predio' data-id='{{ predio.id }}'>Eliminar</button>
+        </div>
+    </form>
+</div>
