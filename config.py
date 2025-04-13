@@ -1,9 +1,8 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import os
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://")  # ¡Importante!
+    # Si usas una variable de entorno en Render
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "postgresql://postgres:btItLfQEwiBLQVVAGBIxuAjLoVQTPAzf@crossover.proxy.rlwy.net:37626/railway"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.environ.get("SECRET_KEY") or "openssl rand -hex 24"
