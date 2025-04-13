@@ -25,9 +25,9 @@ class Predio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(20), unique=True, nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
-    area = db.Column(db.bolean, nullable=False)
-    latitud = db.Column(db.bolean, nullable=False)
-    longitud = db.Column(db.bolean, nullable=False)
+    area = db.Column(db.Float, nullable=False)
+    latitud = db.Column(db.Float, nullable=False)
+    longitud = db.Column(db.Float, nullable=False)
     propietario = db.Column(db.String(100), nullable=False)
     
     def to_dict(self):
