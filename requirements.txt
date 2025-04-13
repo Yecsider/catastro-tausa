@@ -11,3 +11,4 @@ werkzeug==2.0.3
 wtforms==2.3.3
 flask-cli==0.4.0
 geoalchemy2
+shapely
