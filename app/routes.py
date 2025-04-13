@@ -6,6 +6,9 @@ from app.models import User, Predio
 from app.forms import LoginForm, RegistrationForm, PredioForm
 import folium
 from folium.plugins import Draw
+from geoalchemy2.shape import from_shape
+from shapely.geometry import shape
+import json
 
 bp = Blueprint('routes', __name__)
 
@@ -15,20 +18,45 @@ def index():
     # Crear mapa base centrado en Tausa, Cundinamarca
     mapa = folium.Map(location=[5.1968, -73.8868], zoom_start=14)
     
-    # Añadir control de dibujo
-    Draw(export=True).add_to(mapa)
+    # Añadir control de dibujo con opción de polígonos
+    Draw(
+        export=True,
+        draw_options={
+            'polygon': True,
+            'rectangle': True,
+            'circle': False,
+            'polyline': False,
+            'marker': False
+        }
+    ).add_to(mapa)
     
-    # Obtener todos los predios y añadirlos al mapa
+    # Obtener todos los predios y añadirlos al mapa como polígonos
     predios = Predio.query.all()
     for predio in predios:
-        folium.Marker(
-            [predio.latitud, predio.longitud],
-            popup=f"<b>Código:</b> {predio.codigo}<br><b>Dirección:</b> {predio.direccion}<br><b>Área:</b> {predio.area} m²<br><b>Propietario:</b> {predio.propietario}",
-            tooltip=f"Predio {predio.codigo}"
+        geo_data = predio.to_dict()
+        folium.GeoJson(
+            geo_data['geometria'],
+            name=f"Predio {predio.codigo}",
+            tooltip=f"Predio {predio.codigo}",
+            popup=folium.Popup(
+                f"<b>Código:</b> {predio.codigo}<br>"
+                f"<b>Dirección:</b> {predio.direccion}<br>"
+                f"<b>Área:</b> {predio.area} m²<br>"
+                f"<b>Propietario:</b> {predio.propietario}",
+                max_width=300
+            ),
+            style_function=lambda x: {
+                'fillColor': '#3388ff',
+                'color': '#3388ff',
+                'weight': 2,
+                'fillOpacity': 0.5
+            }
         ).add_to(mapa)
     
+    # Añadir control de capas
+    folium.LayerControl().add_to(mapa)
+    
     return render_template('index.html', mapa=mapa._repr_html_())
-
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -66,18 +94,25 @@ def add_predio():
     
     form = PredioForm()
     if form.validate_on_submit():
-        predio = Predio(
-            codigo=form.codigo.data,
-            direccion=form.direccion.data,
-            area=form.area.data,
-            latitud=form.latitud.data,
-            longitud=form.longitud.data,
-            propietario=form.propietario.data
-        )
-        db.session.add(predio)
-        db.session.commit()
-        flash('Predio agregado exitosamente', 'success')
-        return redirect(url_for('routes.list_predios'))
+        try:
+            # Parsear GeoJSON y convertir a polígono
+            geojson = json.loads(form.geometria.data)
+            polygon = shape(geojson['geometry'])
+            
+            predio = Predio(
+                codigo=form.codigo.data,
+                direccion=form.direccion.data,
+                area=form.area.data,
+                geometria=from_shape(polygon, srid=4326),
+                propietario=form.propietario.data
+            )
+            db.session.add(predio)
+            db.session.commit()
+            flash('Predio agregado exitosamente', 'success')
+            return redirect(url_for('routes.list_predios'))
+        except Exception as e:
+            flash(f'Error al procesar la geometría: {str(e)}', 'danger')
+    
     return render_template('add_predio.html', form=form)
 
 @bp.route('/predios/edit/<int:id>', methods=['GET', 'POST'])
@@ -91,15 +126,29 @@ def edit_predio(id):
     form = PredioForm(obj=predio)
     
     if form.validate_on_submit():
-        predio.codigo = form.codigo.data
-        predio.direccion = form.direccion.data
-        predio.area = form.area.data
-        predio.latitud = form.latitud.data
-        predio.longitud = form.longitud.data
-        predio.propietario = form.propietario.data
-        db.session.commit()
-        flash('Predio actualizado exitosamente', 'success')
-        return redirect(url_for('routes.list_predios'))
+        try:
+            # Parsear GeoJSON y convertir a polígono
+            geojson = json.loads(form.geometria.data)
+            polygon = shape(geojson['geometry'])
+            
+            predio.codigo = form.codigo.data
+            predio.direccion = form.direccion.data
+            predio.area = form.area.data
+            predio.geometria = from_shape(polygon, srid=4326)
+            predio.propietario = form.propietario.data
+            db.session.commit()
+            flash('Predio actualizado exitosamente', 'success')
+            return redirect(url_for('routes.list_predios'))
+        except Exception as e:
+            flash(f'Error al procesar la geometría: {str(e)}', 'danger')
+    
+    # Convertir geometría a GeoJSON para el formulario
+    if predio.geometria:
+        form.geometria.data = json.dumps({
+            "type": "Feature",
+            "geometry": predio.to_dict()['geometria']
+        })
+    
     return render_template('edit_predio.html', form=form, predio=predio)
 
 @bp.route('/predios/delete/<int:id>', methods=['POST'])

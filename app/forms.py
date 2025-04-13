@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FloatField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, FloatField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from app.models import User
 
@@ -25,7 +25,7 @@ class PredioForm(FlaskForm):
     codigo = StringField('Código', validators=[DataRequired(), Length(max=20)])
     direccion = StringField('Dirección', validators=[DataRequired(), Length(max=200)])
     area = FloatField('Área (m²)', validators=[DataRequired()])
-    latitud = FloatField('Latitud', validators=[DataRequired()])
-    longitud = FloatField('Longitud', validators=[DataRequired()])
+    # Cambiamos a campo para GeoJSON
+    geometria = TextAreaField('Geometría (GeoJSON)', validators=[DataRequired()])
     propietario = StringField('Propietario', validators=[DataRequired(), Length(max=100)])
     submit = SubmitField('Guardar')

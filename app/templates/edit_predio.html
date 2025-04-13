@@ -26,19 +26,16 @@
                             {{ form.direccion.label(class="form-label") }}
                             {{ form.direccion(class="form-control") }}
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                {{ form.area.label(class="form-label") }}
-                                {{ form.area(class="form-control") }}
-                            </div>
-                            <div class="col-md-4">
-                                {{ form.latitud.label(class="form-label") }}
-                                {{ form.latitud(class="form-control") }}
-                            </div>
-                            <div class="col-md-4">
-                                {{ form.longitud.label(class="form-label") }}
-                                {{ form.longitud(class="form-control") }}
-                            </div>
+                        <div class="mb-3">
+                            {{ form.area.label(class="form-label") }}
+                            {{ form.area(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.geometria.label(class="form-label") }}
+                            {{ form.geometria(class="form-control", rows=5) }}
+                            <small class="form-text text-muted">
+                                Ingrese el polígono en formato GeoJSON. Puede dibujarlo en el mapa y copiar el resultado.
+                            </small>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{{ url_for('routes.list_predios') }}" class="btn btn-secondary me-md-2">
@@ -51,4 +48,11 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Opcional: Puedes añadir aquí código para integrar un editor de mapas
+// que permita dibujar polígonos y generar el GeoJSON automáticamente
+</script>
 {% endblock %}
